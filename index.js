@@ -4,6 +4,7 @@ const productRoutes = require('./src/routes/product.route');
 const authRoutes = require('./src/routes/auth.route');
 const errorHandler = require('./src/middlewares/error.middleware');
 const Product = require('./src/models/product.model');
+const User = require('./src/models/user.model');
 
 require('dotenv').config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 (async () => {
   try {
     await Product.createTable();
+    await User.createTable();
     console.log('Database tables initialized');
   } catch (error) {
     console.error('Error initializing database tables:', error);
@@ -22,7 +24,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/products', productRoutes);
-app.use('/api/register', authRoutes);
+app.use('/api/auth', authRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

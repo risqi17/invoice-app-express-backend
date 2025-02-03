@@ -1,4 +1,5 @@
 const pool = require('../configs/db.config');
+const bcrypt = require('bcryptjs');
 
 class AuthService {
   static async create(userData) {
@@ -10,6 +11,17 @@ class AuthService {
       [username, email, hashedPassword]
     );
     return result.insertId;
+  }
+
+  static async findById(id) {
+    const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+    return rows[0];
+  }
+
+
+  static async findByEmail(email) {
+    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    return rows[0];
   }
 }
 
