@@ -4,8 +4,7 @@ const ResponseUtil = require('../utils/response.util');
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-    console.log('disini');
-
+  
   if (!token) {
     return res.status(401).json(ResponseUtil.fail('Authentication required'));
   }

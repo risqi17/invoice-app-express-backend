@@ -1,12 +1,18 @@
 const ProductService = require('../services/product.service');
+const RestockService = require('../services/restock.service');
 const ResponseUtil = require('../utils/response.util');
 
-class ProductController {
+class RestockController {
   static async create(req, res, next) {
     try {
-      const productId = await ProductService.create(req.body);
-      const product = await ProductService.findById(productId);
-      res.status(201).json(ResponseUtil.success({"products" : product}, 'Product created successfully'));
+      const restockId = await RestockService.createRestock(0, 0, req.user.id);
+
+      if (restockId) {
+        const restockDetail = await RestockService.createRestockDetail(restockId, req.body);
+
+        res.status(201).json(ResponseUtil.success({"restock" : restockDetail}, 'Restock created successfully'));
+      }
+      return res.status(404).json(ResponseUtil.fail('Restock not created'));
     } catch (error) {
       next(error);
     }
@@ -14,8 +20,6 @@ class ProductController {
 
   static async getAll(req, res, next) {
     try {
-      console.log(req.user);
-      
       const products = await ProductService.findAll();
       res.json(ResponseUtil.success({"products" : products}));
     } catch (error) {
@@ -36,7 +40,7 @@ class ProductController {
   }
 
   static async update(req, res, next) {
-    try {      
+    try {
       const affectedRows = await ProductService.update(req.params.id, req.body);
       if (!affectedRows) {
         return res.status(404).json(ResponseUtil.fail('Product not found'));
@@ -61,4 +65,4 @@ class ProductController {
   }
 }
 
-module.exports = ProductController;
+module.exports = RestockController;

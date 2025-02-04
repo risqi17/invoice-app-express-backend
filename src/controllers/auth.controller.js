@@ -7,6 +7,13 @@ const jwt = require('jsonwebtoken');
 class AuthController {
   static async register(req, res, next) {
     try {
+      const { username, email, password } = req.body;
+      const isDuplicate = await AuthService.checkDuplicate(username, email);
+
+      if (isDuplicate) {
+        res.status(400).json(ResponseUtil.fail('Username or email already exists', null));
+      }
+
       const userId = await AuthService.create(req.body);
       const user = await AuthService.findById(userId);
       res.status(201).json(ResponseUtil.success(user, 'Registered successfully'));

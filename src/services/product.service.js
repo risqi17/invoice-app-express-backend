@@ -2,10 +2,10 @@ const pool = require('../configs/db.config');
 
 class ProductService {
   static async create(productData) {
-    const { name, description, price } = productData;
+    const { name, description, price, stock } = productData;
     const [result] = await pool.query(
-      'INSERT INTO products (name, description, price) VALUES (?, ?, ?)',
-      [name, description, price]
+      'INSERT INTO products (name, description, price, stock) VALUES (?, ?, ?, ?)',
+      [name, description, price, stock]
     );
     return result.insertId;
   }
