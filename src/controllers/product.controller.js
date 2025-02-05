@@ -14,8 +14,6 @@ class ProductController {
 
   static async getAll(req, res, next) {
     try {
-      console.log(req.user);
-      
       const products = await ProductService.findAll();
       res.json(ResponseUtil.success({"products" : products}));
     } catch (error) {

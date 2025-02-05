@@ -37,10 +37,59 @@ class RestockService {
         [totalPrice, totalStock, restockId]
     );
 
-    const [rows] = await pool.query('SELECT * FROM restocks WHERE id = ?', [restockId]);
-    rows[0].restockDetails = await pool.query('SELECT * FROM restock_details WHERE restock_id = ?', [restockId]);
+    // const [rows] = await pool.query('SELECT * FROM restocks WHERE id = ?', [restockId]);
+    // const [detail] = await pool.query('DELETE FROM restock_details WHERE restock_id = ?', [restockId]);
     
-    return result.rows[0];
+    const query = `
+      SELECT 
+        r.*, 
+        rd.id AS detail_id,
+        rd.product_id,
+        rd.quantity,
+        rd.price,
+        rd.created_at AS detail_created_at,
+        rd.updated_at AS detail_updated_at
+      FROM restocks r
+      LEFT JOIN restock_details rd ON r.id = rd.restock_id
+      WHERE r.id = ?
+    `;
+
+    const [results] = await pool.query(query, [restockId]);
+
+    // Group details by restock_id
+    const restocksMap = new Map();
+
+    results.forEach((row) => {
+      const restockId = row.id;
+      if (!restocksMap.has(restockId)) {
+        restocksMap.set(restockId, {
+          id: restockId,
+          total_price: row.total_price,
+          total_stock: row.total_stock,
+          created_by: row.created_by,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          restock_details: [],
+        });
+      }
+
+      const restock = restocksMap.get(restockId);
+      if (row.detail_id) {
+        restock.restock_details.push({
+          id: row.detail_id,
+          restock_id: restockId,
+          product_id: row.product_id,
+          quantity: row.quantity,
+          price: row.price,
+          created_at: row.detail_created_at,
+          updated_at: row.detail_updated_at,
+        });
+      }
+    });
+
+    const restocks = Array.from(restocksMap.values());
+
+    return restocks;
   }
 
   static async updateRestockDetail(id, restockData) {

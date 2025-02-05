@@ -10,7 +10,14 @@ class RestockController {
       if (restockId) {
         const restockDetail = await RestockService.createRestockDetail(restockId, req.body);
 
+        console.log(restockDetail);
+        
+
         res.status(201).json(ResponseUtil.success({"restock" : restockDetail}, 'Restock created successfully'));
+        // res.json(ResponseUtil.success({"restock" : 'sukses'}, 'Restock created successfully'));
+
+        // res.status(201).json(ResponseUtil.success({"products" : product}, 'Product created successfully'));
+
       }
       return res.status(404).json(ResponseUtil.fail('Restock not created'));
     } catch (error) {
